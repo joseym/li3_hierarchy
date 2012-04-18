@@ -1,0 +1,1 @@
+# [Lithium PHP](http://lithify.me) Plugin to allow for savvy template inheritance

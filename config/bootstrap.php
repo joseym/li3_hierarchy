@@ -13,12 +13,14 @@ defined('LI3_HIERARCHY_PATH') OR define('LI3_HIERARCHY_PATH', dirname(__DIR__));
  */
 Media::type('default', null, array(
     'view' => '\lithium\template\View',
-    'renderer' => '\li3_smarty\template\view\adapter\Hierarchy',
+    'renderer' => '\li3_hierarchy\template\view\adapter\Hierarchy',
     'paths' => array(
-        'layout' => array(
+        'template' => array(
             LITHIUM_APP_PATH . '/views/{:controller}/{:template}.{:type}.php',
             '{:library}/views/{:controller}/{:template}.{:type}.php',
-        )
+        ),
+        'layout' => false
+
     )
 ));
 

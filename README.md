@@ -74,7 +74,9 @@ __Home View__
 
 So you read this and think to yourself ... "ok, what's so special about that?"
 
-Now you want to create that "About Me" page, because time is short and you're eager to go eat a sandwich the only difference between it and the home page is the sidebar. You don't want it to show the link to the "About Me" page, but rather show the link to the "Home" page. ("wow, baffling example Josey!")
+__quit heckling, heckler!__
+
+Now you want to create that "About Me" page. Because time is short and you're eager to go eat a sandwich you've decided that, for now, the only difference between it and the home page is the sidebar. You don't want it to show the link to the "About Me" page, but rather show the link to the "Home" page. ("wow, baffling example Josey!")
 
 Well, rather than rewriting that page you simply assign it's parent to the home page and modify the sidebar block:
 
@@ -93,6 +95,10 @@ __About Me__
 {block:}
 ~~~
 
-> Ok, I realize this is a painfully simple example but I hope it gets the point across
+> Ok, I realize this is a painfully simple example but I hope it gets the point across.
 
-If you ever have a need to modify a small section of one page for another just extend the original page and change the necessary block.
+This becomes especially useful when dealing with large, complicated project, when certain pages only modify a section or two.
+
+## Some Notes
+1. This project currently uses like formatting of many "PHP Template Engines", but is not, in fact, a template engine itself. You would go about every other lithium layout/view effort exactly as before. This project only attempts to meet a need to offer more power to the rendering method of views.
+2. The current formatting isn't set in stone, as this project is in its infancy it is subject to change dramatically.

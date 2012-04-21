@@ -27,13 +27,19 @@ class Hierarchy extends \lithium\template\view\adapter\File {
 
 		static::$_hierarchy = new \lithium\core\Object;
 		static::$_hierarchy->templatePath = LITHIUM_APP_PATH . "/views/";
-		static::$_hierarchy->children = array();
+		static::$_hierarchy->blocks = array();
 
 	}
 
+	/**
+	 * Render the template
+	 * Starts with the view and rolls up the chain of inheritance
+	 * @param  string $template full path to template file
+	 * @param  array  $data     data vars
+	 * @param  array  $options
+	 * @return string           parsed template with block sections replaced
+	 */
 	public function render($template, $data = array(), array $options = array()) {
-
-		static::$_hierarchy->children = array();
 
 		$defaults = array('context' => array());
 		$options += $defaults;
@@ -42,20 +48,27 @@ class Hierarchy extends \lithium\template\view\adapter\File {
 		$this->_data = (array) $data + $this->_vars;
 
 		$_template = $this->readTemplate($template);
+		
+		// The template had a {:parent:} block
+		// send the parent template on thru
+		if(isset($_template['parent'])){
+			$parent = $_template['parent'];
+			return $this->render($parent, $data, $options);
 
-		if($_template['parent']){
-			static::$_hierarchy->children['children']= $_template;
-			return $this->render($_template['parent'], $data, $options);
+		// Template extends no further
+		// replace the blocks with their content
+		} else {
+			return $this->replace($_template['content']);
 		}
-
-		echo "<pre>";
-		print_r($options['hierarchy']);
-		echo "</pre>";
 
 	}
 
-	public function readTemplate($template){
-
+	/**
+	 * Reads the template file and sets its contents to a variable
+	 * @param  string $template path to template file
+	 * @return array           returns the templates blocks, whether is is a child and its content
+	 */
+	private function readTemplate($template){
 		ob_start();
 		include $template;
 		$content = ob_get_clean();
@@ -64,7 +77,13 @@ class Hierarchy extends \lithium\template\view\adapter\File {
 
 	}
 
-	public function parse($content, $template){
+	/**
+	 * Parses a template file, storing the templates blocks into an object
+	 * @param  string $content  contents of template
+	 * @param  string $template path to template
+	 * @return array           template file, blocks and full content
+	 */
+	private function parse($content, $template){
 
 		$blocks = array();
 		$_parent = (bool)false;
@@ -80,35 +99,47 @@ class Hierarchy extends \lithium\template\view\adapter\File {
 				if(is_array($_blocks = $matches[2]) AND $type == 'blocks'){
 
 					foreach($_blocks as $index => $block){
+						static::$_hierarchy->blocks[$block][] = $matches[3][$index];
 						$blocks[$block] = $matches[3][$index];
 					}
 
 				}
 
-				$content = preg_replace($pattern, '', $content);
-
 			}
 
 		}
 
-		return array('parent' => $_parent, 'template' => $template, 'blocks' => $blocks, 'content' => $content);
 
-	}
+		$hierarchy = array('template' => $template, 'blocks' => $blocks, 'content' => $content);
 
-	public function replace($body, $children){
+		if($_parent){
 
-		// print_r($chilsdren);
-		// print_r(array($body));
-		foreach ($children['blocks'] as $section => $content) {
-			// print_r($content);
-			// $body = preg_replace("/{:(block) \"{y$section}\"}(.*){\\1:}/msU", '', $content);
-			// echo $body;
+			$hierarchy += array('parent' => $_parent);
+
 		}
 
-		// return $body;
+		return $hierarchy;
 
 	}
 
+	/**
+	 * Replaces designated blocks with blocks set by their children
+	 * @param  string $content original template contents
+	 * @return string          template content with block sections replaced
+	 */
+	public function replace($content){
 
+		preg_match_all( static::$_patterns['blocks'], $content, $matches );
+
+		$sections = $matches[2];
+
+		foreach($sections as $section){
+			$pattern = "/{:block \"{$section}\"}(.*){block:}/msU";
+			$content = preg_replace($pattern, static::$_hierarchy->blocks[$section][0], $content);
+		}
+
+		return $content;
+
+	}
 
 }

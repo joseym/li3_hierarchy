@@ -1,31 +1,98 @@
 # [Lithium PHP](http://lithify.me) Plugin to allow for savvy template inheritance
 ***
-> Don't get too excited, this project has only just started but here's what I plan to accomplish, and why.
+> Don't get too excited, this project has only just started and it's currently fairly rough
 ***
 
-## The Why
-I recently created a [Li3 Smarty](https://github.com/joseym/li3_smarty) plugin for the organization I am employed with.
+## Installation
+1. Clone/Download the plugin into your app's ``libraries`` directory.
+2. Tell your app to load the plugin by adding the following to your app's ``config/bootstrap/libraries.php``:
 
-I'm fairly vocal about my distaste for PHP Templating languages, especially Smarty, however I can agree with one thing
+        Libraries::add('li3_hierarchy');
 
-> __Smarty Docs__: [Template Inheritance] keeps template management minimal and efficient, since each template only contains the differences from the template it extends. 
+## Usage
+With this plugin you no longer assign views to layouts the same way as with core lithium templates.
 
-I agree! Sadly Lithium doesn't handle templates and views in this manner.
+#### Originial Method
 
-Before the Smarty project I had made an attempt to add another layout to the rendering order with [Li3 Partials](https://github.com/joseym/li3_partials) which allows you to designate sections in your layout and pass code to those sections from your view.
+__Your Layout__
 
-It was a step in the right direction but still seems a bit lacking.
+~~~ php
+<html>
+	<head>...</head>
+	<body>
+		...
+		<section><?php echo $this->content(); ?></section>
+		...
+	</body>
+</html>
+~~~
 
-## What I Plan to Accomplish
-My goal is to modify the way lithium renders views. In your view you will be able to tell the view what other view it is extending from. The parent view will have sections blocked off that will receive code from it's child.
+> This method blocks a single section in your layout, all content that reside within views will end up here.
+>> While I dont think this is technically _bad_ it does seem a bit limiting
 
-The parent view could just as easily extend another view, and so on, so forth.
+#### Hierarchical method
 
-The very tipity-top view would extend a layout, which is essentially another view. That layout could extend other layouts. All with block designations that would allow you to pass default content or extend from a child.
+__Your Layout__
 
-> Useful if you need to have slight template layout modifications from different pages but want to keep the same basics from a layout or two.
+`layouts/default.html.php`
 
-I also plan to store the content that was set as default so that if you override a block from a child you can pass in what was initially passed in the parent.
+~~~ php
+<html>
+	<head>...</head>
+	<body>
+		...
+		<section>{:block "content"}Default Content{block:}</section>
+		<div id="sidebar">{:block "sidebar"}Default Sidebar{block:}</div>
+		...
+	</body>
+</html>
+~~~
 
-###Enough Rambling
-I'm going to start building it now.
+> So here we have set 2 sections, `content` and `sidebar`. We can change these sections anytime from any view.
+
+Here's how
+
+__Home View__
+
+`pages/home.html.php`
+
+~~~ php
+{:parent "layout/default.html.php":}
+
+{:block "content"}
+	<h2>Welcome to My site!</h2>
+	This is my home page, please wipe your feet.
+{block:}
+
+{:block "sidebar"}
+	<ul>
+		<li><a href="#about">About Me</a></li>
+		<li><a href="#github">My Github Profile</a></li>
+	</ul>
+{block:}
+~~~
+
+So you read this and think to yourself ... "ok, what's so special about that?"
+
+Now you want to create that "About Me" page, because time is short and you're eager to go eat a sandwich the only difference between it and the home page is the sidebar. You don't want it to show the link to the "About Me" page, but rather show the link to the "Home" page. ("wow, baffling example Josey!")
+
+Well, rather than rewriting that page you simply assign it's parent to the home page and modify the sidebar block:
+
+__About Me__
+
+`pages/about.html.php`
+
+~~~ php
+{:parent "pages/home.html.php":}
+
+{:block "sidebar"}
+	<ul>
+		<li><a href="#home">Home</a></li>
+		<li><a href="#github">My Github Profile</a></li>
+	</ul>
+{block:}
+~~~
+
+> Ok, I realize this is a painfully simple example but I hope it gets the point across
+
+If you ever have a need to modify a small section of one page for another just extend the original page and change the necessary block.

@@ -100,10 +100,10 @@ __About Me__
 This becomes especially useful when dealing with large, complicated project, when certain pages only modify a section or two.
 
 ## Some Notes
-1. This project currently uses like formatting of many "PHP Template Engines", but is not, in fact, a template engine itself. You would go about every other lithium layout/view effort exactly as before. This project only attempts to meet a need to offer more power to the rendering method of views.
+1. This project currently uses similar formatting to many "PHP Template Engines", but is not, in fact, a template engine itself. You would go about every other lithium layout/view effort exactly as before. This project only attempts to meet a need to offer more power to the rendering method of views.
 2. The current formatting isn't set in stone, as this project is in its infancy it is subject to change dramatically.
 
-This project was inspired while I worked on my [li3_smarty](https://github.com/joseym/li3_smarty) project.
+This project was inspired while I worked a plugin to provide [Smarty PHP support for Lithium](https://github.com/joseym/li3_smarty) project. (blech)
 
 As I can't stand working with PHP Template Engines but actually think Smarty's template inheritance is a good idea I decided to attempt to achieve/improve upon it without being stuck with the limitations that Smarty enforces.
 
@@ -111,8 +111,8 @@ As I can't stand working with PHP Template Engines but actually think Smarty's t
 1. I plan for this plugin to be able to handle blocks defined and modified from within other blocks, currently it does not support this.
 2. The ability to assign parent (or default) content inside a child
 
-> Say in the `layouts/default.html.php` page the sidebar block had a header already, currently resetting that block replaces its entire contents. It would be nice if you could tell child blocks to place default content somewhere.
->> Perhaps I do this thru the use of a helper.
+> Say in the `layouts/default.html.php` page the sidebar block had a header already. Currently resetting that block replaces its entire contents. It would be nice if you could tell child blocks to place default content somewhere.
+>> Perhaps I'll do this thru the use of a helper.
 
 ## Collaborate
-As always, I welcome your collaboration to make things "even more betterer", so fork and contribute if you feel the need.
+As always, I welcome your collaboration to make things "even more betterer", so fork and contribute if you feel so inclined.

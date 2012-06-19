@@ -58,10 +58,12 @@ class Hierarchy extends \lithium\template\view\adapter\File {
 		// Get all the template blocks
 		static::$_blocks = Lexer::run($template__);
 
+		$this->_context += array('hierarchy' => static::$_blocks);
+
 		// parse the template contents, master is the final template
 		$content = $this->readTemplate(static::$_blocks->master());
 
-		print_r(Parser::run($content, static::$_blocks));
+		return Parser::run($content, static::$_blocks);
 
 
 	}

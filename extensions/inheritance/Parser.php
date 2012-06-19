@@ -49,7 +49,9 @@ class Parser {
 
 		static::$_blocks = $blocks;
 
-		print_r(static::_replace());
+		$_pattern = "/{:(block) \"({:block})\"}(.*){\\1:}/msU";
+		
+		return static::_replace(static::$_source, $_pattern);
 
 	}
 
@@ -58,7 +60,7 @@ class Parser {
 	 * @param  blob $source template source
 	 * @return blob         template source, replaced with blocks
 	 */
-	private static function _replace($source = null){
+	private static function _replace($source = null, $pattern){
 
 		if($source == null) $source = static::$_source;
 
@@ -66,8 +68,20 @@ class Parser {
 
 		foreach($matches[2] as $index => $block){
 
-			$_pattern = "/{:(block) \"({$block})\"}(.*){\\1:}/msU";
-			$source = preg_replace($_pattern, static::$_blocks->blocks("{$block}")->content(), $source);
+			$reparse = false;
+
+			$_pattern = String::insert($pattern, array('block' => $block));
+
+			$_block = static::$_blocks->blocks("{$block}");
+
+			$content = $_block->content();
+
+			// replace content parent blocks
+			if(preg_match("/{:parent:}/msU", $content)) { 
+				$content = preg_replace("/{:parent:}/msU", $_block->parent()->content(), $content);
+			}
+
+			$source = preg_replace($_pattern, $content, $source);
 
 		}
 

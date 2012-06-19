@@ -37,6 +37,10 @@ class Block {
 		return $this->content;
 	}
 
+	public function name(){
+		return $this->_name;
+	}
+
 	public function __set($name, $value){
 		$this->_block[$name] = $value;
 	}

@@ -30,9 +30,8 @@ class BlockSet {
 	}
 
 	public function blocks($name = null){
-			print_r("laksdfjal;sdjkfals;dfjkals;kdfj");
 		if($name !== null) {
-			if(isset($this->{$name})){
+			if(isset($this->_blocks[$name])){
 				return $this->{$name};
 			}
 			return false;

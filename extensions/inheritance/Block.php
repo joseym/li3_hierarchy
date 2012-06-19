@@ -19,9 +19,10 @@ class Block {
 	 * @param  [type] $template [description]
 	 * @return [type]           [description]
 	 */
-	public function push($content, $template){
+	public function push($content, $template, $child = null){
 		$this->parent = new Block($this->_name, $content, $template);
-		// return $this;
+		$this->parent->child = $child;
+		// print_r($this->_block);
 	}
 
 	public function get($name = null){
@@ -31,6 +32,10 @@ class Block {
 
 	public function parent(){
 		return $this->parent;
+	}
+
+	public function child(){
+		return $this->child;
 	}
 
 	public function content(){

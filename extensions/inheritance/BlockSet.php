@@ -20,7 +20,7 @@ class BlockSet {
 	public function push($block, $content, $template){
 
 		if(isset($this->_blocks[$block])){
-			$this->{$block}->push($content, $template);
+			$this->{$block}->push($content, $template, $this->{$block});
 		} else {
 			$this->{$block} = new Block($block, $content, $template);
 		}

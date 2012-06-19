@@ -1,14 +1,24 @@
 <?php
+
+/**
+ * Li3_Hierarchy Lexer: Reads and tokenizes template files and returns their 
+ * "blocks" as a `BlockSet`.
+ *
+ * @copyright     Copyright 2012, Josey Morton (http://github.com/joseym)
+ * @license       http://opensource.org/licenses/bsd-license.php The BSD License
+ */
+
 namespace li3_hierarchy\extensions\inheritance;
 
 use lithium\util\String;
-// use li3_hierarchy\extensions\inheritance\Hierarchy;
 use li3_hierarchy\extensions\inheritance\BlockSet;
 use li3_hierarchy\extensions\inheritance\Block;
 
 class Lexer {
 
 	private static $_hierarchy;
+
+	private static $_master;
 
 	private static $_blockSet;
 
@@ -25,6 +35,10 @@ class Lexer {
 		self::$_blockSet = new BlockSet();
 	}
 
+	public static function terminals(){
+		return static::$_terminals;
+	}
+
 	/**
 	 * Run the Lexer and gather the block objects
 	 * @param  blob 	$source   	template contents
@@ -35,38 +49,45 @@ class Lexer {
 
 		$source = self::_read($template);
 
+		$_blockSet = static::$_blockSet;
+
+		// Set the final template, this gets reset on every iteration to the current template
+		// landing, finally, on the last.
+		static::$_blockSet->master($template);
+
 		foreach(static::$_terminals as $pattern => $terminal ){
 			
+			// attempt to match block/parent regex
 			$_preg = ($terminal == "T_BLOCK") ? preg_match_all($pattern, $source, $matches) : preg_match($pattern, $source, $matches);
-
+			
 			if($_preg){
 
+				// Blocks, load them in the BlockSet
 				if($terminal == "T_BLOCK"){
 
 					foreach($matches[2] as $index => $name){
-						self::$_blockSet->push($name, $matches[3][$index], self::_template($template));
-						continue;
+						static::$_blockSet->push($name, $matches[3][$index], self::_template($template));
 					}
 
+				// Parent templates, read these and throw them back to the lexer.
 				} else {
 
-					print_r('lkajslfakjfll');
-					$template = LITHIUM_APP_PATH . "/views/{$matches[2]}";
-					static::run($template);
+					$_template = LITHIUM_APP_PATH . "/views/{$matches[2]}";
+					static::run($_template);
 
 				}
 
 			}
 		
-			return static::$_blockSet;
-
 		}
+
+		return static::$_blockSet;
 
 	}
 	
 	/**
 	 * Modifies the template string to/from cache path
-	 * @return [type] [description]
+	 * @return string clean filename of template
 	 */
 	protected static function _template($template){
 
@@ -81,14 +102,24 @@ class Lexer {
 		return $template;
 	}
 
+	/**
+	 * Reads the contents of a template file
+	 * Does not parse the file.
+	 * 
+	 * @param string template template path to be loaded
+	 * @return blob content of template file
+	 */
 	private static function _read($template){
 
-		ob_start();
-		include $template;
-		$content = ob_get_clean();
+		if(file_exists($template)){
 
-		print_r($content);
-		return $content;
+			$content = file_get_contents($template);
+
+			return $content;
+
+		}
+
+		return "{$template} doesn't exist";
 
 	}
 

@@ -7,21 +7,30 @@ class BlockSet {
 
 	protected $_blocks;
 
+	/**
+	 * Master template
+	 * @var string location of master template file
+	 */
+	protected $_master;
+
 	public function __construct(){
 		// $this->_blocks = new self();
 	}
 
 	public function push($block, $content, $template){
-		
+
 		if(isset($this->_blocks[$block])){
-			print_r('lkasdjflksa');
+			$this->{$block}->push($content, $template);
+		} else {
+			$this->{$block} = new Block($block, $content, $template);
 		}
 
-		return $this->{$block} = new Block($block, $content, $template);
+		return $this->_blocks;
 
 	}
 
 	public function blocks($name = null){
+			print_r("laksdfjal;sdjkfals;dfjkals;kdfj");
 		if($name !== null) {
 			if(isset($this->{$name})){
 				return $this->{$name};
@@ -37,6 +46,16 @@ class BlockSet {
 
 	public function __get($name){
 		return $this->_blocks[$name];
+	}
+
+	/**
+	 * Set or Retrieve master template from hierarchy
+	 * @param  [type] $template [description]
+	 * @return [type]           [description]
+	 */
+	public function master($template = null){
+		if($template !== null) $this->_master = $template;
+		return $this->_master;
 	}
 
 }

@@ -6,6 +6,7 @@ use \lithium\core\Libraries;
 use \lithium\core\Environment;
 use \lithium\core\Object;
 use \li3_hierarchy\extensions\inheritance\Lexer;
+use \li3_hierarchy\extensions\inheritance\Parser;
 
 class Hierarchy extends \lithium\template\view\adapter\File {
 
@@ -28,10 +29,13 @@ class Hierarchy extends \lithium\template\view\adapter\File {
 
 	/**
 	 * Render the template
-	 * Starts with the view and rolls up the chain of inheritance
+	 * Uses the final view/template returned from the `Lexer::$_blockSet`
 	 * @param  string $template full path to template file
 	 * @param  array  $data     data vars
 	 * @param  array  $options
+	 * 
+	 * @uses Lexer::$_blockSet `BlockSet` returned from templates
+	 * 
 	 * @return string           parsed template with block sections replaced
 	 */
 	public function render($template, $data = array(), array $options = array()) {
@@ -51,13 +55,14 @@ class Hierarchy extends \lithium\template\view\adapter\File {
 			extract((array) $this->_view->outputFilters, EXTR_OVERWRITE);
 		}
 
-		$source = $this->readTemplate($template__);
-
+		// Get all the template blocks
 		static::$_blocks = Lexer::run($template__);
 
-		print_r(static::$_blocks);
+		// parse the template contents, master is the final template
+		$content = $this->readTemplate(static::$_blocks->master());
 
-		return $source;
+		print_r(Parser::run($content, static::$_blocks));
+
 
 	}
 
@@ -75,70 +80,5 @@ class Hierarchy extends \lithium\template\view\adapter\File {
 		return $content;
 
 	}
-
-	/**
-	 * Parses a template file, storing the templates blocks into an object
-	 * @param  string $content  contents of template
-	 * @param  string $template path to template
-	 * @return array           template file, blocks and full content
-	 */
-	// private function parse($content, $template){
-
-	// 	$blocks = array();
-	// 	$_parent = (bool)false;
-
-	// 	foreach(static::$_patterns as $type => $pattern){
-
-	// 		$find = ($type == 'extends') ? preg_match( $pattern, $content, $matches ) : preg_match_all( $pattern, $content, $matches );
-
-	// 		if($find){
-
-	// 			if($type == 'extends') $_parent = static::$_hierarchy->templatePath . $matches[2];
-
-	// 			if(is_array($_blocks = $matches[2]) AND $type == 'blocks'){
-
-	// 				foreach($_blocks as $index => $block){
-	// 					static::$_hierarchy->blocks[$block][] = $matches[3][$index];
-	// 					$blocks[$block] = $matches[3][$index];
-	// 				}
-
-	// 			}
-
-	// 		}
-
-	// 	}
-
-
-	// 	$hierarchy = array('template' => $template, 'blocks' => $blocks, 'content' => $content);
-
-	// 	if($_parent){
-
-	// 		$hierarchy += array('parent' => $_parent);
-
-	// 	}
-
-	// 	return $hierarchy;
-
-	// }
-
-	/**
-	 * Replaces designated blocks with blocks set by their children
-	 * @param  string $content original template contents
-	 * @return string          template content with block sections replaced
-	 */
-	// public function replace($content){
-
-	// 	preg_match_all( static::$_patterns['blocks'], $content, $matches );
-
-	// 	$sections = $matches[2];
-
-	// 	foreach($sections as $section){
-	// 		$pattern = "/{:block \"{$section}\"}(.*){block:}/msU";
-	// 		$content = preg_replace($pattern, static::$_hierarchy->blocks[$section][0], $content);
-	// 	}
-
-	// 	return $content;
-
-	// }
 
 }

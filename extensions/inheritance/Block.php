@@ -19,10 +19,25 @@ class Block {
 	 * @param  [type] $template [description]
 	 * @return [type]           [description]
 	 */
-	public function push($content, $template, $child = null){
-		$this->parent = new Block($this->_name, $content, $template);
-		$this->parent->child = $child;
-		// print_r($this->_block);
+	public function push($content, $template){
+
+		$block = $this;
+		
+		/**
+		 * Recursively dig thru block to find highest parent
+		 * adds this block there.
+		 * @var function
+		 */
+		$_dig = function($block) use (&$content, &$template, &$_dig){
+
+			if($block->parent()) return $_dig($block->parent);
+
+			$block->parent = new Block($block->name(), $content, $template);
+			$block->parent->child = $block;
+
+		};
+		
+		return $_dig($block);
 	}
 
 	public function get($name = null){
@@ -31,6 +46,7 @@ class Block {
 	}
 
 	public function parent(){
+		if(!isset($this->_block['parent'])) return false;
 		return $this->parent;
 	}
 

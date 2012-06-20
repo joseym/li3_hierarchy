@@ -23,7 +23,7 @@ class Lexer {
 	private static $_blockSet;
 
 	protected static $_terminals = array(
-		"/{:(block) \"([a-zA-Z 0-9]+)\"}(.*){\\1:}/msU" => "T_BLOCK",
+		"/{:(block) \"([a-zA-Z 0-9]+)\"(?: \[(.+)\])?}(.*){\\1:}/msU" => "T_BLOCK",
 		"/{:(parent) \"([a-zA-Z 0-9 . \/]+)\":}/msU" 	=> "T_PARENT"
 	);
 
@@ -66,7 +66,19 @@ class Lexer {
 				if($terminal == "T_BLOCK"){
 
 					foreach($matches[2] as $index => $name){
-						static::$_blockSet->push($name, $matches[3][$index], self::_template($template));
+
+						/**
+						 * Block parameters
+						 * Options that can be set to modify how the block is rendered
+						 * @var [type]
+						 */
+						$params = explode(',', $matches[3][$index]);
+						$params = array_map(function($param){
+							return trim($param);
+						}, $params);
+
+						static::$_blockSet->push($name, $matches[4][$index], self::_template($template), $params);
+					
 					}
 
 				// Parent templates, read these and throw them back to the lexer.

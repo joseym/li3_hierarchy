@@ -7,10 +7,11 @@ class Block {
 	protected $_block;
 	protected $_name;
 
-	public function __construct($name, $content, $template){
+	public function __construct($name, $content, $template, $params){
 		$this->_name = $name;
 		$this->content = $content;
 		$this->template = $template;
+		$this->params = $params;
 	}
 
 	/**
@@ -19,25 +20,23 @@ class Block {
 	 * @param  [type] $template [description]
 	 * @return [type]           [description]
 	 */
-	public function push($content, $template){
-
-		$block = $this;
+	public function push($content, $template, $params){
 		
 		/**
 		 * Recursively dig thru block to find highest parent
 		 * adds this block there.
 		 * @var function
 		 */
-		$_dig = function($block) use (&$content, &$template, &$_dig){
+		$_dig = function($block) use (&$content, &$template, &$params, &$_dig){
 
 			if($block->parent()) return $_dig($block->parent);
 
-			$block->parent = new Block($block->name(), $content, $template);
+			$block->parent = new Block($block->name(), $content, $template, $params);
 			$block->parent->child = $block;
 
 		};
 		
-		return $_dig($block);
+		return $_dig($this);
 	}
 
 	public function get($name = null){
@@ -51,6 +50,7 @@ class Block {
 	}
 
 	public function child(){
+		if(!isset($this->_block['child'])) return false;
 		return $this->child;
 	}
 
@@ -60,6 +60,10 @@ class Block {
 
 	public function name(){
 		return $this->_name;
+	}
+
+	public function params(){
+		return $this->params;
 	}
 
 	public function __set($name, $value){

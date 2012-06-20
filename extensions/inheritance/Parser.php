@@ -8,6 +8,13 @@
  * @license       http://opensource.org/licenses/bsd-license.php The BSD License
  */
 
+/**
+ * Todo List:
+ * 
+ * 1. final block content section should be an array in the order of 
+ *    rendered content
+ */
+
 namespace li3_hierarchy\extensions\inheritance;
 
 use lithium\util\String;
@@ -49,7 +56,7 @@ class Parser {
 
 		static::$_blocks = $blocks;
 
-		$_pattern = "/{:(block) \"({:block})\"}(.*){\\1:}/msU";
+		$_pattern = "/{:(block) \"({:block})\"(?: \[(.+)\])?}(.*){\\1:}/msU";
 		
 		return static::_replace(static::$_source, $_pattern);
 
@@ -68,15 +75,28 @@ class Parser {
 
 		foreach($matches[2] as $index => $block){
 
-			$reparse = false;
-
 			$_pattern = String::insert($pattern, array('block' => $block));
 
 			$_block = static::$_blocks->blocks("{$block}");
 
 			$content = $_block->content();
 
-			// replace content parent blocks
+			/**
+			 * Child matches/replacement
+			 */
+			if(preg_match("/{:child:}/msU", $matches[4][$index])){
+
+				if(!$_block->parent()) {
+					$content = preg_replace($_pattern, "", $matches[0][$index]);
+				} else {
+					$content = preg_replace("/{:child:}/msU", $content, $matches[4][$index]);
+				}
+
+			}
+
+			/**
+			 * Parent matches/replacement
+			 */
 			if(preg_match("/{:parent:}/msU", $content)) { 
 				$content = preg_replace("/{:parent:}/msU", $_block->parent()->content(), $content);
 			}

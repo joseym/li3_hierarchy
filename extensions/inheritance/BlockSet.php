@@ -17,12 +17,14 @@ class BlockSet {
 		// $this->_blocks = new self();
 	}
 
-	public function push($block, $content, $template){
+	public function push($block, $content, $template, $params){
+
+		// print_r($block . ": " . $template . "\n");
 
 		if(isset($this->_blocks[$block])){
-			$this->{$block}->push($content, $template, $this->{$block});
+			$this->{$block}->push($content, $template, $params);
 		} else {
-			$this->{$block} = new Block($block, $content, $template);
+			$this->{$block} = new Block($block, $content, $template, $params);
 		}
 
 		return $this->_blocks;

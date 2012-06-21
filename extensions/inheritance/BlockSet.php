@@ -11,7 +11,7 @@ class BlockSet {
 	 * Master template
 	 * @var string location of master template file
 	 */
-	protected $_master;
+	protected $_templates;
 
 	public function __construct(){
 		// $this->_blocks = new self();
@@ -50,13 +50,27 @@ class BlockSet {
 	}
 
 	/**
+	 * Magic method to call a single blockset by name
+	 * 
+	 * @param  string 	$block  	block name
+	 * @param  array 	$options 	options params
+	 * @return object 				block and all it's parents/children
+	 */
+	public function __call($block, $options){
+		return $this->blocks($block);
+	}
+
+	/**
 	 * Set or Retrieve master template from hierarchy
 	 * @param  [type] $template [description]
 	 * @return [type]           [description]
 	 */
-	public function master($template = null){
-		if($template !== null) $this->_master = $template;
-		return $this->_master;
+	public function templates($template = null){
+		if($template !== null) {
+			if(gettype($template) == 'string') $this->_templates[] = $template;
+			if(gettype($template) == 'integer') return $this->_templates[$template];
+		}
+		return $this->_templates;
 	}
 
 }

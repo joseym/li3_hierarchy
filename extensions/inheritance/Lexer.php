@@ -51,9 +51,10 @@ class Lexer {
 
 		$_blockSet = static::$_blockSet;
 
+		$template = self::_template($template);
 		// Set the final template, this gets reset on every iteration to the current template
 		// landing, finally, on the last.
-		static::$_blockSet->master($template);
+		static::$_blockSet->templates($template);
 
 		foreach(static::$_terminals as $pattern => $terminal ){
 			
@@ -77,7 +78,7 @@ class Lexer {
 							return trim($param);
 						}, $params);
 
-						static::$_blockSet->push($name, $matches[4][$index], self::_template($template), $params);
+						static::$_blockSet->push($name, $matches[4][$index], $template, $params);
 					
 					}
 
@@ -108,7 +109,7 @@ class Lexer {
 
 		// create the actual template file name, relative to the views directory
 		if(preg_match($_pattern, $template, $matches)){
-			return str_ireplace("_", "/", "{$matches[1]}.{$matches[2]}.{$matches[3]}");
+			return LITHIUM_APP_PATH . "/views/" .str_ireplace("_", "/", "{$matches[1]}.{$matches[2]}.{$matches[3]}");
 		}
 
 		return $template;

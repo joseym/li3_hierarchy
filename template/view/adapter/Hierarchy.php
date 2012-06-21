@@ -39,7 +39,7 @@ class Hierarchy extends \lithium\template\view\adapter\File {
 	 * @return string           parsed template with block sections replaced
 	 */
 	public function render($template, $data = array(), array $options = array()) {
-		
+
 		$defaults = array('context' => array());
 		$options += $defaults;
 
@@ -60,12 +60,10 @@ class Hierarchy extends \lithium\template\view\adapter\File {
 
 		$this->_context += array('hierarchy' => static::$_blocks);
 
-		// print_r(static::$_blocks);
-
 		// parse the template contents, master is the final template
-		$content = $this->readTemplate(static::$_blocks->master());
+		$content = $this->readTemplate(Parser::parse(static::$_blocks));
 
-		return Parser::run($content, static::$_blocks);
+		return Parser::finish($content);
 
 
 	}

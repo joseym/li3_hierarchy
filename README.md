@@ -99,20 +99,84 @@ __About Me__
 
 This becomes especially useful when dealing with large, complicated project, when certain pages only modify a section or two.
 
+#### Other Features
+
+This plugin gives you the ability to include content from parent/child templates wherever you'd like them.
+
+##### Parent Requests
+
+__About Me__
+
+`pages/about.html.php`
+
+~~~ php
+{:parent "pages/home.html.php":}
+
+{:block "sidebar"}
+	{:parent:}
+	<ul>
+		<li><a href="#home">Home</a></li>
+		<li><a href="#github">My Github Profile</a></li>
+	</ul>
+{block:}
+~~~
+
+The `{:parent:}` line above tells the renderer to load the content that is stored within `pages/home.html.php` block `sidebar` above the content you are assigning in `pages/home.html.php` block `sidebar`.
+
+##### Child Requests
+
+Similar to the above example: you can place child content from parents
+
+__Home Page__
+
+`pages/home.html.php`
+
+~~~ php
+{:parent "pages/default.html.php":}
+
+{:block "sidebar"}
+	<ul>
+		<li><a href="#home">Home</a></li>
+		<li><a href="#github">My Github Profile</a></li>
+	</ul>
+	{:child"}
+{block:}
+~~~
+
+Now whatever you add in the `sidebar` block within the `pages/about.html.php` template will be loaded in after the content that resides in the `sidebar` block of the `pages/home.html.php` template!
+
+##### Wrapping Blocks
+
+There will be times when you may want to load child content within markup but not load that markup if no child exists.
+
+Here is how you accomplish that. It's easy!
+
+__Home Page__
+
+`pages/home.html.php`
+
+~~~ php
+{:parent "pages/default.html.php":}
+
+{:block "advert"}
+	<div class="leaderboard advert">
+	{:child"}
+	</div>
+{block:}
+~~~
+
+Like in the `child` example above this will load whatever content you assign within the `advert` block from any child templates (templates that assign `pages/home.html.php` as their parent).
+
+What happens if a page that extends `pages/home.html.php` doesn't have an `advert` block? The entire block is removed! If you assign an `advert` block from a child, however, the contents will be loaded within the `<div class="advert ..." />` markup.
+
 ## Some Notes
-1. This project currently uses similar formatting to many "PHP Template Engines", but is not, in fact, a template engine itself. You would go about every other lithium layout/view effort exactly as before. This project only attempts to meet a need to offer more power to the rendering method of views.
-2. The current formatting isn't set in stone, as this project is in its infancy it is subject to change dramatically.
+1. This project currently uses similar formatting to many "PHP Template Engines", but is not, in fact, a template engine itself. You would go about every other lithium layout/view effort exactly as before. This project only attempts to meet a need to offer more power and inheritance to the rendering method of views.
 
-This project was inspired while I worked a plugin to provide [Smarty PHP support for Lithium](https://github.com/joseym/li3_smarty) project. (blech)
-
-As I can't stand working with PHP Template Engines but actually think Smarty's template inheritance is a good idea I decided to attempt to achieve/improve upon it without being stuck with the limitations that Smarty enforces.
+2. This project was inspired while I worked a plugin to provide [Smarty PHP support for Lithium](https://github.com/joseym/li3_smarty) project. (blech)! As I can't stand working with PHP Template Engines but actually think Smarty's template inheritance is a good idea I decided to attempt to achieve/improve upon it without being stuck with the limitations that Smarty enforces.
 
 ## Plans for the future
 1. I plan for this plugin to be able to handle blocks defined and modified from within other blocks, currently it does not support this.
-2. The ability to assign parent (or default) content inside a child
-
-> Say in the `layouts/default.html.php` page the sidebar block had a header already. Currently resetting that block replaces its entire contents. It would be nice if you could tell child blocks to place default content somewhere.
->> Perhaps I'll do this thru the use of a helper.
+2. Caching: I need to figure out a good way to cache the ladder of templates but still know when a modification was made.
 
 ## Collaborate
 As always, I welcome your collaboration to make things "even more betterer", so fork and contribute if you feel so inclined.

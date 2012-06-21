@@ -54,7 +54,18 @@ class Block {
 		return $this->child;
 	}
 
-	public function content(){
+	/**
+	 * The parsed version of the block
+	 * @return [type] [description]
+	 */
+	public function parsed($content = null){
+		if($content !== null) $this->parsed = $content;
+		if(!isset($this->_block['parsed'])) return false;
+		return $this->parsed;
+	}
+
+	public function content($content = null){
+		if($content !== null) $this->content = $content;
 		return $this->content;
 	}
 

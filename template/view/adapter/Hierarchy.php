@@ -7,6 +7,7 @@ use \lithium\core\Environment;
 use \lithium\core\Object;
 use \li3_hierarchy\extensions\inheritance\Lexer;
 use \li3_hierarchy\extensions\inheritance\Parser;
+use \lithium\storage\Cache;
 
 class Hierarchy extends \lithium\template\view\adapter\File {
 
@@ -41,7 +42,7 @@ class Hierarchy extends \lithium\template\view\adapter\File {
 	public function render($template, $data = array(), array $options = array()) {
 
 		$defaults = array('context' => array());
-		$options += $defaults;
+		$options += $defaults; 
 
 		$this->_context = $options['context'] + $this->_context;
 		$this->_data = (array) $data + $this->_vars;
@@ -61,10 +62,9 @@ class Hierarchy extends \lithium\template\view\adapter\File {
 		$this->_context += array('hierarchy' => static::$_blocks);
 
 		// parse the template contents, master is the final template
-		$content = $this->readTemplate(Parser::parse(static::$_blocks));
+		$cache = Parser::parse(static::$_blocks);
 
-		return Parser::finish($content);
-
+		return $this->readTemplate($cache);
 
 	}
 
@@ -75,8 +75,10 @@ class Hierarchy extends \lithium\template\view\adapter\File {
 	 */
 	private function readTemplate($template){
 
+		$cachePath = Libraries::get(true, 'resources') . '/tmp/cache/templates/';
+
 		ob_start();
-		include $template;
+		include "{$cachePath}{$template}";
 		$content = ob_get_clean();
 
 		return $content;

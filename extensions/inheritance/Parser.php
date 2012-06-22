@@ -17,10 +17,12 @@
 
 namespace li3_hierarchy\extensions\inheritance;
 
-use lithium\util\String;
-use li3_hierarchy\extensions\inheritance\BlockSet;
-use li3_hierarchy\extensions\inheritance\Block;
-use li3_hierarchy\extensions\inheritance\Lexer;
+use \lithium\core\Libraries;
+use \lithium\util\String;
+use \lithium\storage\Cache;
+use \li3_hierarchy\extensions\inheritance\BlockSet;
+use \li3_hierarchy\extensions\inheritance\Block;
+use \li3_hierarchy\extensions\inheritance\Lexer;
 
 class Parser {
 
@@ -35,6 +37,8 @@ class Parser {
 	 * @var array
 	 */
 	protected static $_templates;
+
+	protected static $_template;
 
 	/**
 	 * `BlockSet` object, set from render method
@@ -58,26 +62,28 @@ class Parser {
 
 		static::$_templates = array_reverse($blocks->templates());
 		
+
 		$i = 0;
 		while ($i < $count = count(static::$_templates)) {
-
 			if($i == $count) break;
 			$source = static::_read(static::$_templates[$i]);
-			static::_replace($source);
+			$template = static::_replace($source, $i);
 			$i++;
-
 		}
 
 		// final parent template handler
-		return static::$_templates[0];
+		return static::$_template;
 	}
 
 	/**
 	 * Replaces blocks with content from `BlockSet`
 	 * @param  blob $source template source
+	 * @param  bool $final `true` if this template is this the last template
 	 * @return blob         template source, replaced with blocks
 	 */
-	private static function _replace($source, $type = 'prep'){
+	private static function _replace($source, $i){
+
+		$cachePath = Libraries::get(true, 'resources') . '/tmp/cache/templates/';
 
 		$pattern = "/{:(block) \"({:block})\"(?: \[(.+)\])?}(.*){\\1:}/msU";
 
@@ -191,7 +197,11 @@ class Parser {
 
 		}
 
-		return $source;
+		// 0 should always be the final template
+		if($i == 0){
+			file_put_contents($cachePath.sha1($source), $source);
+			static::$_template = sha1($source);
+		}
 
 	}
 
@@ -204,12 +214,6 @@ class Parser {
 			return $content;
 
 		}
-
-	}
-
-	public static function finish($source){
-
-		return static::_replace($source);
 
 	}
 

@@ -166,11 +166,14 @@ class Parser {
 							// just remove the call for child block
 							$content = preg_replace("/{:child:}/msU", "", $blockContent);
 						}
+					// Block DOES have a child block
 					} else {
 						// replace with child contents
 						// return $_children($child);
-						// print_r($block->name());
-						$content = preg_replace("/{:child:}/msU", $_block->content(), $blockContent);
+						$content = preg_replace("/{:child:}/msU", $child->content(), $blockContent);
+						if(preg_match("/{:child:}/msU", $_block->content())){
+							die('child has child too!');
+						}
 					}
 
 				// not asking for a child

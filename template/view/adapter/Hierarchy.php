@@ -41,6 +41,7 @@ class Hierarchy extends \lithium\template\view\adapter\File {
 	 */
 	public function render($template, $data = array(), array $options = array()) {
 
+		$cachePath = Libraries::get(true, 'resources') . '/tmp/cache/templates/';
 		$defaults = array('context' => array());
 		$options += $defaults; 
 
@@ -53,36 +54,30 @@ class Hierarchy extends \lithium\template\view\adapter\File {
 		if ($this->_config['extract']) {
 			extract($this->_data, EXTR_OVERWRITE);
 		} elseif ($this->_view) {
+			die('something');
 			extract((array) $this->_view->outputFilters, EXTR_OVERWRITE);
 		}
 
-		// Get all the template blocks
-		static::$_blocks = Lexer::run($template__);
+		// Load pages/layouts 
+		if(!preg_match("/element/", Lexer::_template($template__))){
 
-		$this->_context += array('hierarchy' => static::$_blocks);
+			// Get all the template blocks
+			static::$_blocks = Lexer::run($template__);
 
-		// parse the template contents, master is the final template
-		$cache = Parser::parse(static::$_blocks);
+			$this->_context['hierarchy']= static::$_blocks;
 
-		return $this->readTemplate($cache);
+			// parse the template contents, master is the final template
+			$cacheFile = Parser::parse(static::$_blocks);
 
-	}
+			$template__ = $cachePath.$cacheFile;
 
-	/**
-	 * Reads the template file and sets its contents to a variable
-	 * @param  string $template path to template file
-	 * @return array           returns the templates blocks, whether is is a child and its content
-	 */
-	private function readTemplate($template){
-
-		$cachePath = Libraries::get(true, 'resources') . '/tmp/cache/templates/';
+		}
 
 		ob_start();
-		include "{$cachePath}{$template}";
-		$content = ob_get_clean();
-
-		return $content;
+		include $template__;
+		return ob_get_clean();
 
 	}
+
 
 }

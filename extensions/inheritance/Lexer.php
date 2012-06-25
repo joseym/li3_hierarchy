@@ -102,7 +102,7 @@ class Lexer {
 	 * Modifies the template string to/from cache path
 	 * @return string clean filename of template
 	 */
-	protected static function _template($template){
+	public static function _template($template){
 
 		// template_{$oname}_{$stats['ino']}_{$stats['mtime']}_{$stats['size']}.php
 		$_pattern = "/template_(?:[a-zA-Z]+)_(.+)\.(.+)_(?:[0-9]+)_(?:[0-9]+)_(?:[0-9]+)\.(.+)$/";

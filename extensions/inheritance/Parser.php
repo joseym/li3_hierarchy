@@ -96,6 +96,8 @@ class Parser {
 
 			$_block = static::$_blocks->blocks("{$block}");
 
+			$_blocks = static::$_blocks;
+
 			/**
 			 * Top level content for block
 			 * @var string
@@ -115,16 +117,15 @@ class Parser {
 
 				$parent = $block->parent();
 
-				if(preg_match("/{:([a-zA-Z]+):}/msU", $content, $_matches)) { 
+				if(preg_match("/{:parent:}/msU", $content, $_matches)) { 
 
-					if($_matches[1] == 'parent') {
-
-							$content = preg_replace("/{:$_matches[1]:}/msU", $parent->content(), $content);
-
-							// go again
-							return $_parents($block->parent(), $content);
-							break;
-
+					if($parent){
+						$content = preg_replace("/{:parent:}/msU", $parent->content(), $content);
+						// go again
+						return $_parents($block->parent(), $content);
+					} else {
+						// no parent, remove the request
+						$content = preg_replace("/{:parent:}/msU", "", $content);
 					}
 
 				}
@@ -133,12 +134,15 @@ class Parser {
 
 			};
 
-			$_blocks = static::$_blocks;
-			$_children = function($block) use (&$content, &$_children, &$matches, &$index, &$_pattern, &$_blocks){
+			/**
+			 * Parse the block and check to see if it's parents request it.
+			 * @var method
+			 */
+			$_children = function($block, $content = null) use (&$_children, &$matches, &$index, &$_pattern, &$_blocks){
 
-				$blockContent = $block->content();
+				$content = ($content == null) ? $block->content() : $content;
+
 				$_block = $_blocks->blocks($block->name());
-
 				/**
 				 * If the block has a child then we're not at the bottom of the chain.
 				 * We need to move up until we cant
@@ -153,8 +157,7 @@ class Parser {
 				 */
 				$parent = $block->parent();
 
-				if(preg_match("/{:child:}/msU", $blockContent)) { 
-
+				if(preg_match("/{:child:}/msU", $content)) { 
 					// Block doesn't have a child block
 					if(!$child){
 						// Also has no parent
@@ -164,23 +167,22 @@ class Parser {
 						} else {
 							// Has a parent, still no child tho
 							// just remove the call for child block
-							$content = preg_replace("/{:child:}/msU", "", $blockContent);
-						}
-					// Block DOES have a child block
-					} else {
-						// replace with child contents
-						// return $_children($child);
-						$content = preg_replace("/{:child:}/msU", $child->content(), $blockContent);
-						if(preg_match("/{:child:}/msU", $_block->content())){
-							die('child has child too!');
+							$content = preg_replace("/{:child:}/msU", "", $content);
+							return $_children($block, $content);
 						}
 					}
 
 				// not asking for a child
 				} else {
 
+					// Has a parent
 					if($parent){
-						return $_children($parent);
+
+						if(preg_match("/{:child:}/msU", $parent->content())){
+							$content = preg_replace("/{:child:}/msU", $content, $parent->content());
+							return $_children($parent, $content);
+						}
+
 					}
 
 				}
@@ -190,11 +192,10 @@ class Parser {
 
 			};
 
+			// parse children
 			$content = $_children($_block);
+			// parse parents
 			$content = $_parents($_block);
-
-			// assign the parsed content to the block
-			// $_block->parsed($content);
 
 			$source = preg_replace($_pattern, $content, $source);
 

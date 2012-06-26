@@ -68,8 +68,6 @@ class Hierarchy extends \lithium\template\view\adapter\File {
 
 			if(gettype(static::$_blocks) == 'object'){
 
-				$this->_context['hierarchy']= static::$_blocks;
-
 				// parse the template contents, master is the final template
 				$cacheFile = Parser::parse(static::$_blocks);
 

@@ -22,16 +22,21 @@ class Cache {
 		$this->_cacheDir = $this->_library['path'] . '/resources/tmp/cache';
 	}
 
-	public function write($source, $name){
-		$serializePath = $this->_cacheDir.'/hierarchy/'.sha1($name).'.srl.txt';
-		$source = "<?php \$this->hierarchy = unserialize(file_get_contents(\"$serializePath\")) ?>\n\r" . $source;
-		$path = $this->_cacheDir."/template/".sha1($name);
+	public function write($source, $name, $hierarchy){
 
-		if(file_put_contents($path, $source)){
-			// return sha1 of file name
-			return sha1($name);
+		$paths['serial'] = $this->_cacheDir.'/hierarchy/'.sha1($name);
+		$paths['template'] = $this->_cacheDir.'/template/'.sha1($name);
+
+		$serializePath = $paths['serial'];
+
+		$source = "<?php \$this->hierarchy = unserialize(file_get_contents(\"$serializePath\")) ?>\n\r" . $source;
+
+		if(file_put_contents($paths['template'], $source) AND 
+			file_put_contents($paths['serial'], serialize($hierarchy))){
+			// return path to cache file.
+			return $this->file(sha1($name));
 		}
-		die("not fucking written");
+
 		return false;
 
 	}
@@ -48,11 +53,6 @@ class Cache {
 
 		return $file->getPathname();
 
-	}
-
-	public function filename($template){
-		$template = substr(str_ireplace('/', '_', $template), 1);
-		return $template;
 	}
 
 	public function cacheDir(){

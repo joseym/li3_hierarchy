@@ -44,16 +44,24 @@ class Lexer {
 	 * Run the Lexer and gather the block objects
 	 * @param  blob 	$source   	template contents
 	 * @param  string 	$template 	path to template
-	 * @return object           	BlockSet object
+	 * @return object|string        BlockSet object or path to cached template
 	 */
 	public static function run($template){
+
+		/**
+		 * Lets check for cache, if exists then we'll return the cache file name
+		 * @var Cache
+		 */
 		$_cache = new Cache();
-		$_cacheFile = sha1($_cache->filename(static::_template($template)));
+		$_cacheFile = sha1(static::_template($template));
 
 		if($_isCached = $_cache->file($_cacheFile)){
 			return $_isCached;
 		}
 
+		/**
+		 * Guess there was no cache file, lets lex this mother.
+		 */
 		$source = self::_read($template);
 
 		$_blockSet = static::$_blockSet;
@@ -100,8 +108,7 @@ class Lexer {
 			}
 		
 		}
-		$cachename = sha1(static::_template($_cache->filename(static::$_blockSet->templates(0))));
-		file_put_contents($_cache->cacheDir().'/hierarchy/'.$cachename.'.srl.txt', serialize(static::$_blockSet));
+
 		return static::$_blockSet;
 
 

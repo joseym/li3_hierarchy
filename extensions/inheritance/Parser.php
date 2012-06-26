@@ -211,9 +211,7 @@ class Parser {
 
 		// 0 should always be the final template
 		if($i == 0){
-			$cache = new Cache();
-			$name = substr(str_ireplace('/', '_', static::$_blocks->templates(0)), 1);
-			static::$_template = $cache->write($source, $name, $_blocks);
+			static::$_template = $cache->write($source, static::$_blocks->templates(0), $_blocks);
 		}
 
 	}

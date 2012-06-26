@@ -1,0 +1,20 @@
+{
+	"name": "joseym/li3_hierarchy",
+	"type": "lithium-library",
+	"description": "A Lithium PHP plugin to allow for template inheritance. It's slick.",
+	"keywords": ["lithium", "li3", "hierarcy", "inheritance", "templates", "views", "layouts"],
+	"homepage": "https://github.com/joseym/li3_hierarchy/blob/master/README.md",
+	"license": "The BSD License",
+	"authors": [
+		{
+			"name": "Josey Morton",
+			"email": "me@joseymorton.com",
+			"homepage": "https://github.com/joseym"
+		}
+	],
+
+	"require": {
+		"composer/installers": "*"
+	}
+
+}

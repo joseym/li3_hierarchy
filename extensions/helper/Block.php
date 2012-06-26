@@ -11,9 +11,12 @@ class Block extends \lithium\template\Helper {
 	 * @return function        returns the `place()` method
 	 */
 	public function __call($method, $options){
-		
-		return $this->_context->hierarchy->{$method}->content();
-		
+		$blocks = $this->_context->hierarchy->blocks();
+		if(!empty($blocks[$method])){
+			return $this->_context->hierarchy->{$method}->content();
+		} else {
+			return false;
+		}
 	}
 
 }

@@ -13,6 +13,7 @@ namespace li3_hierarchy\extensions\inheritance;
 use lithium\util\String;
 use li3_hierarchy\extensions\inheritance\BlockSet;
 use li3_hierarchy\extensions\inheritance\Block;
+use li3_hierarchy\extensions\inheritance\Cache;
 
 class Lexer {
 
@@ -46,6 +47,12 @@ class Lexer {
 	 * @return object           	BlockSet object
 	 */
 	public static function run($template){
+		$_cache = new Cache();
+		$_cacheFile = sha1($_cache->filename(static::_template($template)));
+
+		if($_isCached = $_cache->file($_cacheFile)){
+			return $_isCached;
+		}
 
 		$source = self::_read($template);
 
@@ -93,8 +100,10 @@ class Lexer {
 			}
 		
 		}
-
+		$cachename = sha1(static::_template($_cache->filename(static::$_blockSet->templates(0))));
+		file_put_contents($_cache->cacheDir().'/hierarchy/'.$cachename.'.srl.txt', serialize(static::$_blockSet));
 		return static::$_blockSet;
+
 
 	}
 	

@@ -19,10 +19,10 @@ namespace li3_hierarchy\extensions\inheritance;
 
 use \lithium\core\Libraries;
 use \lithium\util\String;
-use \lithium\storage\Cache;
 use \li3_hierarchy\extensions\inheritance\BlockSet;
 use \li3_hierarchy\extensions\inheritance\Block;
 use \li3_hierarchy\extensions\inheritance\Lexer;
+use \li3_hierarchy\extensions\inheritance\Cache;
 
 class Parser {
 
@@ -40,6 +40,8 @@ class Parser {
 
 	protected static $_template;
 
+	protected static $_cacheFile;
+
 	/**
 	 * `BlockSet` object, set from render method
 	 * @var object
@@ -54,21 +56,28 @@ class Parser {
 	 */
 	public static function parse($blocks){
 
+		$cache = new Cache();
+		
 		static::$_terminals = array_flip(Lexer::terminals());
 
 		static::$_blocks = $blocks;
 
+		static::$_cacheFile = substr(str_ireplace('/', '_', static::$_blocks->templates(0)), 1);
+
 		$_pattern = "/{:(block) \"({:block})\"(?: \[(.+)\])?}(.*){\\1:}/msU";
 
 		static::$_templates = array_reverse($blocks->templates());
-		
 
-		$i = 0;
-		while ($i < $count = count(static::$_templates)) {
-			if($i == $count) break;
-			$source = static::_read(static::$_templates[$i]);
-			$template = static::_replace($source, $i);
-			$i++;
+		if($file = $cache->file(sha1(static::$_cacheFile))){
+			return sha1(static::$_cacheFile);
+		} else {
+			$i = 0;
+			while ($i < $count = count(static::$_templates)) {
+				if($i == $count) break;
+				$source = static::_read(static::$_templates[$i]);
+				$template = static::_replace($source, $i);
+				$i++;
+			}
 		}
 
 		// final parent template handler
@@ -82,15 +91,14 @@ class Parser {
 	 * @return blob         template source, replaced with blocks
 	 */
 	private static function _replace($source, $i){
-
-		$cachePath = Libraries::get(true, 'resources') . '/tmp/cache/templates/';
+		$cache = new Cache();
+		$cachePath = $cache->cacheDir()."/template/";
 
 		$pattern = "/{:(block) \"({:block})\"(?: \[(.+)\])?}(.*){\\1:}/msU";
 
 		preg_match_all(static::$_terminals['T_BLOCK'], $source, $matches);
 
 		foreach($matches[2] as $index => $block){
-
 
 			$_pattern = String::insert($pattern, array('block' => $block));
 
@@ -203,8 +211,9 @@ class Parser {
 
 		// 0 should always be the final template
 		if($i == 0){
-			file_put_contents($cachePath.sha1($source), $source);
-			static::$_template = sha1($source);
+			$cache = new Cache();
+			$name = substr(str_ireplace('/', '_', static::$_blocks->templates(0)), 1);
+			static::$_template = $cache->write($source, $name, $_blocks);
 		}
 
 	}

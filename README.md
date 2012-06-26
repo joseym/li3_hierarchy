@@ -4,12 +4,36 @@
 ***
 
 ## Installation
-1. Clone/Download the plugin into your app's ``libraries`` directory.
+
+### Use Composer
+__It's like pie... In that it's awesome, and so is pie!__
+
+Modify your projects `composer.json` file
+
+~~~ json
+{
+    "require": {
+    	...
+        "joseym/li3_hierarchy": "master"
+        ...
+    }
+}
+~~~
+
+Run `php composer.phar install` (or `php composer.phar update`) and, aside from adding it to your Libraries, you should be good to go.
+
+### Clone, Download, or Submodule
+__Old Timey Way__
+
+1. Clone/Download/submodule the plugin into your app's ``libraries`` directory.
 2. Tell your app to load the plugin by adding the following to your app's ``config/bootstrap/libraries.php``:
 
-        Libraries::add('li3_hierarchy');
-
 ## Usage
+
+Add the plugin in your `config/bootstrap/libraries.php` file:
+
+    Libraries::add('li3_hierarchy');
+
 With this plugin you no longer assign views to layouts the same way as with core lithium templates.
 
 #### Originial Method

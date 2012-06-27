@@ -34,7 +34,13 @@ __Old Timey Way__
 
 Add the plugin in your `config/bootstrap/libraries.php` file:
 
-    Libraries::add('li3_hierarchy');
+~~~ php
+<?php
+	Libraries::add('li3_hierarchy', array(
+		'cache' => true // optional configuration, defaults to true in prod, false everywhere else.
+	));
+?>
+~~~
 
 With this plugin you no longer assign views to layouts the same way as with core lithium templates.
 

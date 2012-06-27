@@ -55,7 +55,7 @@ class Lexer {
 		$_cache = new Cache();
 		$_cacheFile = sha1(static::_template($template));
 
-		if($_isCached = $_cache->file($_cacheFile)){
+		if($_isCached = $_cache->file($_cacheFile) AND $_cache->cache()){
 			return $_isCached;
 		}
 

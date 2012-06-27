@@ -211,7 +211,11 @@ class Parser {
 
 		// 0 should always be the final template
 		if($i == 0){
-			static::$_template = $cache->write($source, static::$_blocks->templates(0), $_blocks);
+
+			if($cacheable = $cache->write($source, static::$_blocks->templates(0), $_blocks)){
+				static::$_template = $cacheable;
+			}
+
 		}
 
 	}

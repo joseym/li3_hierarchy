@@ -13,6 +13,7 @@ namespace li3_hierarchy\extensions\inheritance;
 use lithium\util\String;
 use li3_hierarchy\extensions\inheritance\BlockSet;
 use li3_hierarchy\extensions\inheritance\Block;
+use li3_hierarchy\extensions\inheritance\Cache;
 
 class Lexer {
 
@@ -43,10 +44,24 @@ class Lexer {
 	 * Run the Lexer and gather the block objects
 	 * @param  blob 	$source   	template contents
 	 * @param  string 	$template 	path to template
-	 * @return object           	BlockSet object
+	 * @return object|string        BlockSet object or path to cached template
 	 */
 	public static function run($template){
 
+		/**
+		 * Lets check for cache, if exists then we'll return the cache file name
+		 * @var Cache
+		 */
+		$_cache = new Cache();
+		$_cacheFile = sha1(static::_template($template));
+
+		if($_isCached = $_cache->file($_cacheFile) AND $_cache->cache()){
+			return $_isCached;
+		}
+
+		/**
+		 * Guess there was no cache file, lets lex this mother.
+		 */
 		$source = self::_read($template);
 
 		$_blockSet = static::$_blockSet;
@@ -95,6 +110,7 @@ class Lexer {
 		}
 
 		return static::$_blockSet;
+
 
 	}
 	

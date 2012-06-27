@@ -7,7 +7,7 @@ use \lithium\core\Environment;
 use \lithium\core\Object;
 use \li3_hierarchy\extensions\inheritance\Lexer;
 use \li3_hierarchy\extensions\inheritance\Parser;
-use \lithium\storage\Cache;
+use \li3_hierarchy\extensions\inheritance\Cache;
 
 class Hierarchy extends \lithium\template\view\adapter\File {
 
@@ -41,7 +41,6 @@ class Hierarchy extends \lithium\template\view\adapter\File {
 	 */
 	public function render($template, $data = array(), array $options = array()) {
 
-		$cachePath = Libraries::get(true, 'resources') . '/tmp/cache/templates/';
 		$defaults = array('context' => array());
 		$options += $defaults; 
 
@@ -54,23 +53,30 @@ class Hierarchy extends \lithium\template\view\adapter\File {
 		if ($this->_config['extract']) {
 			extract($this->_data, EXTR_OVERWRITE);
 		} elseif ($this->_view) {
-			die('something');
 			extract((array) $this->_view->outputFilters, EXTR_OVERWRITE);
 		}
 
+		$cleanTemplate = Lexer::_template($template__);
+
 		// Load pages/layouts 
-		if(!preg_match("/element/", Lexer::_template($template__))){
+		if(!preg_match("/element/", $cleanTemplate)){
+
+			$cache = new Cache();
 
 			// Get all the template blocks
 			static::$_blocks = Lexer::run($template__);
 
-			$this->_context['hierarchy']= static::$_blocks;
+			if(gettype(static::$_blocks) == 'object'){
 
-			// parse the template contents, master is the final template
-			$cacheFile = Parser::parse(static::$_blocks);
+				// parse the template contents, master is the final template
+				$cacheFile = Parser::parse(static::$_blocks);
 
-			$template__ = $cachePath.$cacheFile;
+			} else {
+				// print_r($cleanTemplate);
+				$cacheFile = static::$_blocks;
+			}
 
+			$template__ = $cacheFile;
 		}
 
 		ob_start();

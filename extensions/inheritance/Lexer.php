@@ -25,15 +25,18 @@ class Lexer {
 
 	protected static $_terminals = array(
 		"/{:(block) \"([a-zA-Z 0-9]+)\"(?: \[(.+)\])?}(.*){\\1:}/msU" => "T_BLOCK",
-		"/{:(parent) \"([a-zA-Z 0-9 . \/]+)\":}/msU" 	=> "T_PARENT"
+		"/{:(parent) (\w+\s)*\"([a-zA-Z 0-9 . \/]+)\":}/msU" 	=> "T_PARENT"
 	);
 
 	/**
 	 * Build the hierarchy objects
 	 * @return [type] [description]
 	 */
-	public static function _init(){
+	public static function _init($options = array()){
 		self::$_blockSet = new BlockSet();
+		if(isset($options['hierarchy'])){
+			static::$_hierarchy = $options['hierarchy'];
+		}
 	}
 
 	public static function terminals(){
@@ -46,7 +49,7 @@ class Lexer {
 	 * @param  string 	$template 	path to template
 	 * @return object|string        BlockSet object or path to cached template
 	 */
-	public static function run($template){
+	public static function run($template, $data = array(), array $options = array()){
 
 		/**
 		 * Lets check for cache, if exists then we'll return the cache file name
@@ -98,11 +101,30 @@ class Lexer {
 					}
 
 				// Parent templates, read these and throw them back to the lexer.
-				} else {
+				} else {	
+					if(!empty( static::$_hierarchy)){
+						list($type, $file) = array_slice($matches, 2);
+						if(empty($type)){
+							$type = 'template';
+						} else{
+							$type = trim($type);
+						}
 
-					$_template = LITHIUM_APP_PATH . "/views/{$matches[2]}";
-					static::run($_template);
+						// override the controller if more than simple file name is passed in. First directory becomes controller
+						$file = explode('/', ltrim($file, '/'));
+						if(count($file) > 1){
+							$options['controller'] = array_shift($file);				
+						}
+						// set filename to template/layout
+						$options[$type] = implode('/', $file);
 
+						// template path from \lithium\template\view\adapter\File
+						$_template = static::$_hierarchy->template($type, $options);
+					// if $_hierarchy not passed in, use template as is
+					} else {
+						$_template = $matches[3];
+					}
+					static::run($_template, $data, $options);
 				}
 
 			}

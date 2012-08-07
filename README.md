@@ -155,6 +155,12 @@ __About Me__
 
 The `{:parent:}` line above tells the renderer to load the content that is stored within `pages/home.html.php` block `sidebar` above the content you are assigning in `pages/about.html.php` block `sidebar`.
 
+You can also optionally force the parent to use the rendering, namely specialized paths, for a specifc type (layout/template). To do so specify layout/template directly after :parent.
+
+~~~ php
+{:parent layout "pages/home.html.php":}
+~~~
+
 ##### Child Requests
 
 Similar to the above example: you can place child content from parents

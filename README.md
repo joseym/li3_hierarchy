@@ -158,7 +158,7 @@ The `{:parent:}` line above tells the renderer to load the content that is store
 You can also optionally force the parent to use the rendering, namely specialized paths, for a specifc type (layout/template). To do so specify layout/template directly after :parent.
 
 ~~~ php
-{:parent layout "pages/home.html.php":}
+{:parent layout "pages/home":}
 ~~~
 
 ##### Child Requests

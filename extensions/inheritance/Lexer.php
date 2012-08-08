@@ -11,9 +11,11 @@
 namespace li3_hierarchy\extensions\inheritance;
 
 use lithium\util\String;
+use lithium\net\http\Media;
 use li3_hierarchy\extensions\inheritance\BlockSet;
 use li3_hierarchy\extensions\inheritance\Block;
 use li3_hierarchy\extensions\inheritance\Cache;
+
 
 class Lexer {
 
@@ -116,7 +118,18 @@ class Lexer {
 							$options['controller'] = array_shift($file);				
 						}
 						// set filename to template/layout
-						$options[$type] = implode('/', $file);
+						$file = implode('/', $file);
+
+						preg_match('/('.implode('|', Media::types()).')\.php$/', $file, $extensions);
+
+						if(count($extensions) == 2){
+							// remove .{:type}.php
+							$file = substr($file, 0, strlen($file) - strlen($extensions[0]) - 1);
+							// set type to render as extension specified
+							$options['type'] = $extensions[1];
+						}
+
+						$options[$type] = $file;
 
 						// template path from \lithium\template\view\adapter\File
 						$_template = static::$_hierarchy->template($type, $options);

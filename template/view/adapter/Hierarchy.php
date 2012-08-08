@@ -11,8 +11,6 @@ use \li3_hierarchy\extensions\inheritance\Cache;
 
 class Hierarchy extends \lithium\template\view\adapter\File {
 
-	protected static $_hierarchy;
-
 	protected static $_blocks;
 
 	public function __construct(array $config = array()) {
@@ -24,8 +22,8 @@ class Hierarchy extends \lithium\template\view\adapter\File {
 		parent::__construct($config + $defaults);
 
 		// Start the hierarchy lexer
-		static::$_hierarchy = Lexer::_init();
-
+		Lexer::_init(array('hierarchy' => $this));
+		
 	}
 
 	/**
@@ -40,21 +38,12 @@ class Hierarchy extends \lithium\template\view\adapter\File {
 	 * @return string           parsed template with block sections replaced
 	 */
 	public function render($template, $data = array(), array $options = array()) {
-
 		$defaults = array('context' => array());
 		$options += $defaults; 
 
 		$this->_context = $options['context'] + $this->_context;
 		$this->_data = (array) $data + $this->_vars;
 		$template__ = $template;
-
-		unset($options, $template, $defaults, $data);
-
-		if ($this->_config['extract']) {
-			extract($this->_data, EXTR_OVERWRITE);
-		} elseif ($this->_view) {
-			extract((array) $this->_view->outputFilters, EXTR_OVERWRITE);
-		}
 
 		$cleanTemplate = Lexer::_template($template__);
 
@@ -64,12 +53,12 @@ class Hierarchy extends \lithium\template\view\adapter\File {
 			$cache = new Cache();
 
 			// Get all the template blocks
-			static::$_blocks = Lexer::run($template__);
+			static::$_blocks = Lexer::run($template__, $data, $options);
 
 			if(gettype(static::$_blocks) == 'object'){
 
 				// parse the template contents, master is the final template
-				$cacheFile = Parser::parse(static::$_blocks);
+				$cacheFile = Parser::parse(static::$_blocks, $data, $options);
 
 			} else {
 				// print_r($cleanTemplate);
@@ -79,11 +68,24 @@ class Hierarchy extends \lithium\template\view\adapter\File {
 			$template__ = $cacheFile;
 		}
 
+		unset($options, $template, $defaults, $data);
+
+		if ($this->_config['extract']) {
+			extract($this->_data, EXTR_OVERWRITE);
+		} elseif ($this->_view) {
+			extract((array) $this->_view->outputFilters, EXTR_OVERWRITE);
+		}
+
 		ob_start();
 		include $template__;
 		return ob_get_clean();
 
 	}
 
+	// public function template($type, array $params) {
+	// 	if($type != 'layout'){
+	// 		parent::template($type, $params);			
+	// 	}
+	// }
 
 }

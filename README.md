@@ -34,7 +34,13 @@ __Old Timey Way__
 
 Add the plugin in your `config/bootstrap/libraries.php` file:
 
-    Libraries::add('li3_hierarchy');
+~~~ php
+<?php
+	Libraries::add('li3_hierarchy', array(
+		'cache' => true // optional configuration, defaults to true in prod, false everywhere else.
+	));
+?>
+~~~
 
 With this plugin you no longer assign views to layouts the same way as with core lithium templates.
 
@@ -148,6 +154,12 @@ __About Me__
 ~~~
 
 The `{:parent:}` line above tells the renderer to load the content that is stored within `pages/home.html.php` block `sidebar` above the content you are assigning in `pages/about.html.php` block `sidebar`.
+
+You can also optionally force the parent to use the rendering, namely specialized paths, for a specifc type (layout/template). To do so specify layout/template directly after :parent.
+
+~~~ php
+{:parent layout "pages/home":}
+~~~
 
 ##### Child Requests
 

@@ -27,7 +27,7 @@ Media::type('default', null, array(
 ));
 
 Media::applyFilter('view', function($self, $params, $chain) {
-	if(isset($params['handler']['renderer']) && array_pop(explode('\\', $params['handler']['renderer'])) == 'Hierarchy'){
+	if(isset($params['handler']['renderer']) && array_slice(explode('\\', $params['handler']['renderer']), -1, 1) == array('Hierarchy')) {
 		$params['handler']['processes'] = array(
 			'all' => array('template'),
 			'template' => array('template'),
@@ -36,7 +36,3 @@ Media::applyFilter('view', function($self, $params, $chain) {
 	}
 	return $chain->next($self, $params, $chain);
 });
-
-
-
-?>

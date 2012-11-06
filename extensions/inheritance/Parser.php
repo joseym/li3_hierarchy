@@ -98,6 +98,8 @@ class Parser {
 
 		preg_match_all(static::$_terminals['T_BLOCK'], $source, $matches);
 
+		$_blocks = null;
+
 		foreach($matches[2] as $index => $block){
 
 			$_pattern = String::insert($pattern, array('block' => $block));

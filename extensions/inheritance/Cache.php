@@ -40,7 +40,7 @@ class Cache {
 
 		$serializePath = $paths['serial'];
 
-		$source = "<?php \n\t/** Generated on $date **/\n\r\t\$this->hierarchy = unserialize(file_get_contents(\"$serializePath\"))\n ?>\n\r\n\r" . $source;
+		$source = "<?php \n\t/** Generated on $date **/\n\r\t\$this->hierarchy = unserialize(file_get_contents(\"$serializePath\"))\n ?>" . $source;
 
 		if(file_put_contents($paths['template'], $source) AND 
 			file_put_contents($paths['serial'], serialize($hierarchy))){

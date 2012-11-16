@@ -26,8 +26,8 @@ class Lexer {
 	private static $_blockSet;
 
 	protected static $_terminals = array(
-		"/{:(block) \"([a-zA-Z 0-9]+)\"(?: \[(.+)\])?}(.*){\\1:}/msU" => "T_BLOCK",
-		"/{:(parent) (\w+\s)*\"([a-zA-Z 0-9 . \/]+)\":}/msU" 	=> "T_PARENT"
+		"/{:(block) \"([^\"]+)\"(?: \[(.+)\])?}(.*){\\1:}/msU" => "T_BLOCK",
+		"/{:(parent) (\w+\s)*\"([^\"]+)\":}/msU" 	=> "T_PARENT"
 	);
 
 	/**

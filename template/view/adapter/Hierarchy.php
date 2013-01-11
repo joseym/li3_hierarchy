@@ -45,10 +45,8 @@ class Hierarchy extends \lithium\template\view\adapter\File {
 		$this->_data = (array) $data + $this->_vars;
 		$template__ = $template;
 
-		$cleanTemplate = Lexer::_template($template__);
-
 		// Load pages/layouts 
-		if(!preg_match("/element/", $cleanTemplate)){
+		if(!preg_match("/element/", $template__)){
 
 			$cache = new Cache();
 
@@ -61,7 +59,6 @@ class Hierarchy extends \lithium\template\view\adapter\File {
 				$cacheFile = Parser::parse(static::$_blocks, $data, $options);
 
 			} else {
-				// print_r($cleanTemplate);
 				$cacheFile = static::$_blocks;
 			}
 

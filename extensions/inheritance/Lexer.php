@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Li3_Hierarchy Lexer: Reads and tokenizes template files and returns their 
+ * Li3_Hierarchy Lexer: Reads and tokenizes template files and returns their
  * "blocks" as a `BlockSet`.
  *
  * @copyright     Copyright 2012, Josey Morton (http://github.com/joseym)
@@ -57,8 +57,12 @@ class Lexer {
 		 * Lets check for cache, if exists then we'll return the cache file name
 		 * @var Cache
 		 */
+		$options += array(
+			'type' => 'html',
+		);
 		$_cache = new Cache();
-		$_cacheFile = sha1(static::_template($template));
+		$file = static::_template($template);
+		$_cacheFile = sha1($file . $options['type']);
 
 		if($_isCached = $_cache->file($_cacheFile) AND $_cache->cache()){
 			return $_isCached;

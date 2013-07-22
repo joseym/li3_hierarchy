@@ -54,7 +54,11 @@ class Parser {
 	 * @param  object 	$blocks `BlockSet` object
 	 * @return [type]         [description]
 	 */
-	public static function parse($blocks){
+	public static function parse($blocks, $data, $options){
+
+		$options += array(
+			'type' => 'html',
+		);
 
 		$cache = new Cache();
 		
@@ -64,18 +68,20 @@ class Parser {
 
 		static::$_cacheFile = substr(str_ireplace('/', '_', static::$_blocks->templates(0)), 1);
 
+		$key = static::$_cacheFile . $options['type'];
+
 		$_pattern = "/{:(block) \"({:block})\"(?: \[(.+)\])?}(.*){\\1:}/msU";
 
 		static::$_templates = array_reverse($blocks->templates());
 
-		if($file = $cache->file(sha1(static::$_cacheFile))){
-			return sha1(static::$_cacheFile);
+		if ($cache->file(sha1($key))) {
+			return sha1($key);
 		} else {
 			$i = 0;
 			while ($i < $count = count(static::$_templates)) {
 				if($i == $count) break;
 				$source = static::_read(static::$_templates[$i]);
-				$template = static::_replace($source, $i);
+				$template = static::_replace($source, $i, $options);
 				$i++;
 			}
 		}
@@ -88,9 +94,10 @@ class Parser {
 	 * Replaces blocks with content from `BlockSet`
 	 * @param  blob $source template source
 	 * @param  bool $final `true` if this template is this the last template
+	 * @param  array $options
 	 * @return blob         template source, replaced with blocks
 	 */
-	private static function _replace($source, $i){
+	private static function _replace($source, $i, $options){
 		$cache = new Cache();
 		$cachePath = $cache->cacheDir()."/template/";
 
@@ -213,8 +220,7 @@ class Parser {
 
 		// 0 should always be the final template
 		if($i == 0){
-
-			if($cacheable = $cache->write($source, static::$_blocks->templates(0), $_blocks)){
+			if($cacheable = $cache->write($source, static::$_blocks->templates(0), $_blocks, $options)){
 				static::$_template = $cacheable;
 			}
 

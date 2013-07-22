@@ -31,10 +31,16 @@ class Cache {
 
 	}
 
-	public function write($source, $name, $hierarchy){
+	public function write($source, $name, $hierarchy, $options){
 
-		$paths['serial'] = $this->_cacheDir.'/hierarchy/'.sha1($name);
-		$paths['template'] = $this->_cacheDir.'/template/'.sha1($name);
+		$options += array(
+			'type' => null,
+		);
+
+		$key = $name . $options['type'];
+
+		$paths['serial'] = $this->_cacheDir.'/hierarchy/'.sha1($key);
+		$paths['template'] = $this->_cacheDir.'/template/'.sha1($key);
 
 		$date = date('l jS \of F Y h:i:s A');
 
@@ -45,7 +51,7 @@ class Cache {
 		if(file_put_contents($paths['template'], $source) AND 
 			file_put_contents($paths['serial'], serialize($hierarchy))){
 			// return path to cache file.
-			return $this->file(sha1($name));
+			return $this->file(sha1($key));
 		}
 
 		return false;

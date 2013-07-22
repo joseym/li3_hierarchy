@@ -38,8 +38,8 @@ class Hierarchy extends \lithium\template\view\adapter\File {
 	 * @return string           parsed template with block sections replaced
 	 */
 	public function render($template, $data = array(), array $options = array()) {
-		$defaults = array('context' => array());
-		$options += $defaults; 
+		$defaults = array('context' => array(), 'type' => 'html');
+		$options += $defaults;
 
 		$this->_context = $options['context'] + $this->_context;
 		$this->_data = (array) $data + $this->_vars;
